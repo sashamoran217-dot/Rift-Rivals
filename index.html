@@ -1,0 +1,591 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Rift Rivals</title>
+<style>
+:root{color-scheme:dark;--line:#405b78;--text:#f4f7fb;--muted:#afbed0;--gold:#ffd36e;--mint:#62e0b6}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 50% -10%,#263b57 0,#101827 55%);color:var(--text);font-family:system-ui,Segoe UI,Arial,sans-serif;padding:18px}
+main{max-width:1080px;margin:auto}
+header{text-align:center;margin:0 0 16px}
+h1{margin:0;font-size:clamp(28px,4vw,40px);letter-spacing:2px}
+header p{color:var(--muted);margin:4px 0 0;font-size:14px}
+button,select{font:inherit}
+button:focus-visible,select:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+[hidden]{display:none!important}
+
+/* Main menu */
+.menu-shell{max-width:850px;margin:28px auto 0;background:linear-gradient(150deg,#243951ee,#17283bee);border:1px solid #516b87;border-radius:22px;padding:clamp(18px,4vw,34px);box-shadow:0 18px 50px #0006}
+.menu-top{text-align:center;margin-bottom:24px}
+.menu-top .eyebrow{font-weight:800;color:#9db6d2;letter-spacing:2px;font-size:12px}
+.balance{display:inline-flex;align-items:center;gap:10px;margin-top:13px;padding:10px 20px;border-radius:999px;background:#332f24;border:1px solid #8e733b;color:var(--gold);font-size:22px;font-weight:900;box-shadow:0 4px 18px #0003}
+.balance small{font-size:11px;letter-spacing:1px;color:#d9c28e}
+.menu-panel{background:#132238b8;border:1px solid #405b78;border-radius:16px;padding:18px}
+.panel-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:5px}
+.panel-heading h2{margin:0;font-size:20px}
+.panel-heading span{font-size:11px;color:#9eb1c8;letter-spacing:1px;font-weight:800}
+.menu-note{color:var(--muted);font-size:13px;margin:5px 0 16px}
+.shop-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.shop-item{min-width:0;background:linear-gradient(160deg,#2c435d,#1c2d43);border:1px solid #526d8a;border-radius:13px;padding:12px;display:flex;flex-direction:column;gap:7px}
+.shop-item .shop-name{font-weight:900;font-size:15px}
+.shop-item .shop-stats{font-size:11px;color:#b7c6d7;line-height:1.45;flex:1}
+.shop-item .shop-price{font-size:12px;color:var(--gold);font-weight:900}
+.shop-btn{width:100%;padding:9px;border:1px solid #66819e;border-radius:8px;background:#314b67;color:#fff;font-weight:800;cursor:pointer}
+.shop-btn:hover{background:#3e5e80}
+.shop-btn:disabled{opacity:.45;cursor:not-allowed}
+@media(max-width:700px){.shop-grid{grid-template-columns:1fr}}
+.deck-editor{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.deck-slot{min-width:0;background:linear-gradient(160deg,#2c435d,#1c2d43);border:1px solid #526d8a;border-radius:13px;padding:12px}
+.slot-number{font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:#9db3cc;font-weight:800}
+.slot-troop{font-size:16px;font-weight:900;margin:8px 0 4px}
+.slot-desc{min-height:32px;color:#b7c6d7;font-size:11px;line-height:1.35;margin-bottom:10px}
+.deck-slot select{width:100%;background:#101d30;color:#f4f7fb;border:1px solid #637e9d;border-radius:8px;padding:9px 7px;font-size:12px}
+.menu-actions{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:22px}
+.play-button{border:0;border-radius:12px;padding:14px 42px;background:linear-gradient(180deg,#7bf0c4,#39b991);color:#09271e;font-size:18px;font-weight:1000;letter-spacing:1px;cursor:pointer;box-shadow:0 7px 0 #20785f,0 12px 24px #0004;transition:transform .12s}
+.play-button:hover{transform:translateY(-2px)}
+.play-button:active{transform:translateY(3px);box-shadow:0 4px 0 #20785f}
+.menu-status{text-align:center;min-height:20px;color:#b6c8d9;font-size:12px;margin:18px 0 0}
+.save-note{text-align:center;color:#8094ac;font-size:11px;margin-top:15px}
+.autosave-pill{display:inline-block;margin-top:8px;padding:5px 10px;border:1px solid #3c7867;border-radius:999px;background:#153a32;color:#9ff0ca;font-size:10px;font-weight:900;letter-spacing:1px}
+.career-line{color:#afbed0;text-align:center;font-size:12px;margin-top:9px}
+.round-result{margin:12px 0;padding:18px;border-radius:15px;border:1px solid #7287a2;background:linear-gradient(145deg,#263b53,#16283c);text-align:center;box-shadow:0 10px 28px #0004}
+.round-result h2{margin:0 0 5px;font-size:25px}
+.round-result p{color:#c1cede;margin:5px 0 13px;font-size:13px}
+.reward-breakdown{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:12px auto 16px;max-width:650px}
+.reward-item{padding:9px;border-radius:9px;background:#101f32;border:1px solid #405b78}
+.reward-item b{display:block;color:var(--gold);font-size:18px}
+.reward-item span{font-size:10px;color:#aebfd0;text-transform:uppercase;letter-spacing:.7px}
+@media(max-width:700px){.reward-breakdown{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* Battle */
+.battle-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
+.battle-heading header{margin:0;text-align:left}
+.battle-heading h1{font-size:clamp(23px,3vw,32px)}
+.menu-button{background:#263c55;border:1px solid #607b99;color:#f4f7fb;border-radius:9px;padding:9px 13px;font-weight:800;cursor:pointer}
+.menu-button:hover{background:#354f6d}
+.hud{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:9px;margin-bottom:10px}
+.stat{background:linear-gradient(180deg,#243951,#1b2b40);border:1px solid var(--line);border-radius:12px;padding:9px 12px;text-align:center;box-shadow:0 5px 16px #0002}
+.value{font-size:21px;font-weight:800;font-variant-numeric:tabular-nums}
+.label{font-size:11px;color:var(--muted);letter-spacing:.8px;text-transform:uppercase}
+.arena-wrap{border:1px solid #516b87;border-radius:16px;overflow:hidden;box-shadow:0 12px 34px #0005}
+canvas{width:100%;height:auto;display:block;cursor:crosshair;touch-action:manipulation}
+.status{min-height:38px;background:#17263a;border:1px solid var(--line);border-radius:10px;margin:10px 0;padding:9px 12px;text-align:center;color:#dbe7f4;font-size:14px}
+.section-title{font-size:13px;color:#aebfd2;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;margin:15px 2px 8px}
+.cards,.upgrades{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.workshop-note{font-size:12px;color:#aebfd0;margin:-2px 2px 9px;line-height:1.4}
+.card,.upgrade,.utility{border:1px solid var(--line);border-radius:12px;background:linear-gradient(160deg,#293f59,#1b2b40);color:var(--text);padding:11px;text-align:left;cursor:pointer;min-width:0;transition:transform .12s,border-color .12s}
+.card:hover,.upgrade:hover,.utility:hover{transform:translateY(-2px);border-color:#87a5c5}
+.card.active{border:2px solid var(--gold);padding:10px;background:linear-gradient(160deg,#4b4938,#29364b);box-shadow:0 0 0 2px #ffd36e26}
+.card:disabled,.upgrade:disabled{opacity:.42;cursor:not-allowed;transform:none}
+.card .top{display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:14px;gap:4px}
+.card .icon{font-size:22px}
+.card .cost,.upgrade .price{color:var(--gold);font-size:12px;font-weight:800;white-space:nowrap}
+.card .desc,.upgrade .desc{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.35}
+.upgrade .name{font-weight:800;font-size:13px;display:flex;justify-content:space-between;gap:5px}
+.upgrade .level{font-size:11px;color:#9fc9bb;margin-top:3px}
+.footer{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:15px 0 4px}
+.utility{padding:9px 16px;text-align:center;font-weight:700;font-size:13px}
+.hint{text-align:center;color:#899bb0;font-size:11px;margin:9px 0 0}
+@media(max-width:700px){body{padding:10px}.deck-editor{grid-template-columns:1fr}.deck-slot{display:grid;grid-template-columns:1fr 1fr;column-gap:10px;align-items:center}.slot-number{grid-column:1/-1}.slot-troop{margin:5px 0}.slot-desc{min-height:0;margin:0}.deck-slot select{grid-column:2;grid-row:2/4}.hud{grid-template-columns:repeat(2,1fr)}.cards,.upgrades{grid-template-columns:repeat(2,minmax(0,1fr))}.card,.upgrade{padding:9px}.section-title{margin-top:12px}.battle-heading{align-items:flex-start}}
+</style>
+</head>
+<body>
+<main>
+  <section id="menuScreen">
+    <header>
+      <h1>⚡ RIFT RIVALS</h1>
+      <p>Build your squad, command the battlefield, and break the rival core.</p>
+    </header>
+    <div class="menu-shell">
+      <div class="menu-top">
+        <div class="eyebrow">YOUR BASE</div>
+        <div class="balance">🪙 <span id="menuGold">35</span> <small>GOLD</small></div>
+      </div>
+      <div class="menu-panel">
+        <div class="panel-heading">
+          <h2>🃏 Troop changer</h2>
+          <span>YOUR 3-CARD BATTLE DECK</span>
+        </div>
+        <p class="menu-note">Choose which three troops you want to take into battle. Changing a slot with a troop already in your deck swaps their positions.</p>
+        <div class="deck-editor" id="deckEditor"></div>
+      </div>
+      <div class="menu-panel" style="margin-top:14px">
+        <div class="panel-heading">
+          <h2>🛒 Troop shop</h2>
+          <span>UNLOCK NEW FIGHTERS</span>
+        </div>
+        <p class="menu-note">Spend your round rewards to unlock new troops permanently. Once purchased, they can be added to any deck slot above.</p>
+        <div class="shop-grid" id="shopGrid"></div>
+      </div>
+      <div class="menu-actions">
+        <button class="play-button" id="playBtn">▶ PLAY</button>
+      </div>
+      <div class="menu-status" id="menuStatus">Your gold and troop deck are saved in this browser.</div>
+      <div class="autosave-pill">✓ AUTO-SAVE ON</div>
+      <div class="career-line" id="careerLine">0 rounds played · 0 victories</div>
+      <div class="save-note" id="saveNote">Gold is awarded when a round ends and is used to unlock troops. Battle upgrades use separate Rift Shards.</div>
+    </div>
+  </section>
+
+  <section id="battleScreen" hidden>
+    <div class="battle-heading">
+      <header><h1>⚡ RIFT RIVALS</h1><p>Build your squad, command the battlefield, and break the rival core.</p></header>
+      <button class="menu-button" id="menuBtn">☰ Main menu</button>
+    </div>
+    <section class="hud" aria-label="Battle resources">
+      <div class="stat"><div class="value" id="energyValue">5 / 10</div><div class="label">⚡ Energy</div></div>
+      <div class="stat"><div class="value" id="shardValue">0</div><div class="label">💠 Rift Shards</div></div>
+      <div class="stat"><div class="value" id="chestValue">0</div><div class="label">Treasure chests collected</div></div>
+      <div class="stat"><div class="value" id="killValue">0</div><div class="label">Enemy troops defeated</div></div>
+      <div class="stat"><div class="value" id="coreValue">2000/2000 : 2000/2000</div><div class="label">Your core : Rival core</div></div>
+    </section>
+    <div class="arena-wrap"><canvas id="game" width="960" height="560" aria-label="Rift Rivals battlefield"></canvas></div>
+    <div class="status" id="status" role="status">Choose a troop card, then click a lane to deploy. Click one of your troops to command it.</div>
+    <div class="round-result" id="roundResult" hidden>
+      <h2 id="resultTitle">Round complete</h2>
+      <p id="resultDescription"></p>
+      <div class="reward-breakdown" id="rewardBreakdown"></div>
+      <button class="play-button" id="backToMenuBtn">BACK TO MAIN MENU</button>
+    </div>
+    <div class="section-title">Deploy troops · select a card, then click either lane</div>
+    <div class="cards" id="cards"></div>
+    <div class="section-title">Battle workshop · spend Rift Shards earned during this match</div>
+    <div class="workshop-note">Defeat enemy troops to earn shards. Rare chests give a bonus too. These upgrades last for this battle only and do not use your menu gold.</div>
+    <div class="upgrades" id="upgrades"></div>
+    <div class="footer">
+      <button class="utility" id="cancelBtn">Cancel selection · Esc</button>
+      <button class="utility" id="restartBtn">↻ Restart match</button>
+    </div>
+    <div class="hint">Controls: click one of your troops, then click a destination to move it. Defeats earn Rift Shards for battle upgrades; chest rewards also add menu gold at round end.</div>
+  </section>
+</main>
+
+<script>
+'use strict';
+const SAVE_KEY='riftRivalsProgressV1';
+const troopTypes=[
+  {id:'runner',name:'Runner',icon:'🏃',cost:2,hp:64,damage:10,speed:54,range:28,rate:.78,color:'#62e0b6',desc:'Quick and cheap close-range fighter.'},
+  {id:'ranger',name:'Ranger',icon:'🏹',cost:3,hp:52,damage:14,speed:29,range:125,rate:1.15,color:'#82c6ff',desc:'Long-range support with light armour.'},
+  {id:'guardian',name:'Guardian',icon:'🛡️',cost:4,hp:158,damage:19,speed:20,range:32,rate:1.3,color:'#ffd078',desc:'Tough frontline defender.'},
+  {id:'spark',name:'Spark',icon:'✨',cost:4,hp:66,damage:23,speed:27,range:95,rate:1.45,color:'#d6a0ff',desc:'Powerful ranged energy attacks.'},
+  {id:'titan',name:'Titan',icon:'🗿',cost:6,hp:360,damage:37,speed:11,range:31,rate:1.65,color:'#e5a86f',desc:'A massive tank with huge health.',shopCost:110},
+  {id:'medic',name:'Medic',icon:'💚',cost:4,hp:88,damage:5,speed:27,range:108,rate:1.1,color:'#83e7a2',desc:'Heals nearby injured allies during fights.',role:'healer',heal:19,shopCost:95},
+  {id:'frost',name:'Frost Mage',icon:'❄️',cost:4,hp:78,damage:15,speed:25,range:118,rate:1.25,color:'#9ceaff',desc:'Ranged attacks slow enemy troops.',role:'slower',shopCost:85},
+  {id:'assassin',name:'Assassin',icon:'🗡️',cost:4,hp:72,damage:34,speed:72,range:26,rate:.88,color:'#d5a4ff',desc:'Very fast melee fighter with heavy strikes.',shopCost:75},
+  {id:'bomber',name:'Bomber',icon:'💣',cost:5,hp:104,damage:25,speed:21,range:112,rate:1.65,color:'#ffbd72',desc:'Bombs deal splash damage to nearby enemies.',role:'splash',splashRadius:55,shopCost:95},
+  {id:'shieldbearer',name:'Shieldbearer',icon:'🛡️',cost:5,hp:285,damage:13,speed:17,range:27,rate:1.2,color:'#9fb4ca',desc:'Armoured defender that takes reduced damage.',armor:.72,shopCost:105},
+  {id:'stormcaller',name:'Stormcaller',icon:'🌩️',cost:5,hp:96,damage:23,speed:24,range:145,rate:1.38,color:'#f0e28a',desc:'Lightning strikes from long range and slows targets.',role:'slower',shopCost:120},
+  {id:'pyromancer',name:'Pyromancer',icon:'🔥',cost:5,hp:88,damage:29,speed:23,range:125,rate:1.55,color:'#ff9277',desc:'Fireballs burn groups of nearby enemies.',role:'splash',splashRadius:38,shopCost:135}
+];
+const upgradeDefs=[
+  {id:'regen',name:'Energy recharge',desc:'+0.12 energy regenerated per second per level.',base:2,max:6},
+  {id:'capacity',name:'Energy storage',desc:'+2 maximum energy per level.',base:3,max:5},
+  {id:'power',name:'Squad training',desc:'+12% damage for all your troops per level.',base:3,max:5},
+  {id:'discount',name:'Efficient crafting',desc:'Troops cost 1 less energy per level (minimum 1).',base:4,max:3}
+];
+const defaultDeck=['runner','ranger','guardian'];
+function loadProgress(){
+  const starterTroops=troopTypes.filter(t=>!t.shopCost).map(t=>t.id);
+  const fresh={gold:35,deck:[...defaultDeck],ownedTroops:[...starterTroops],totalRounds:0,totalWins:0,lastReward:0};
+  try{
+    const saved=JSON.parse(localStorage.getItem(SAVE_KEY)||'null');
+    if(!saved)return fresh;
+    if(Number.isFinite(saved.gold)&&saved.gold>=0)fresh.gold=Math.floor(saved.gold);
+    if(Number.isFinite(saved.totalRounds)&&saved.totalRounds>=0)fresh.totalRounds=Math.floor(saved.totalRounds);
+    if(Number.isFinite(saved.totalWins)&&saved.totalWins>=0)fresh.totalWins=Math.floor(saved.totalWins);
+    if(Number.isFinite(saved.lastReward)&&saved.lastReward>=0)fresh.lastReward=Math.floor(saved.lastReward);
+    if(Array.isArray(saved.ownedTroops)){
+      const valid=saved.ownedTroops.filter(id=>troopTypes.some(t=>t.id===id));
+      fresh.ownedTroops=[...new Set([...starterTroops,...valid])];
+    }
+    if(Array.isArray(saved.deck)){
+      const valid=saved.deck.filter(id=>fresh.ownedTroops.includes(id));
+      if(valid.length===3&&new Set(valid).size===3)fresh.deck=valid;
+    }
+  }catch(e){console.warn('Could not load saved progress.',e);}
+  return fresh;
+}
+const progress=loadProgress();
+let gold=progress.gold;
+let upgrades={regen:0,capacity:0,power:0,discount:0};
+let upgradeShards=0;
+let deckIds=progress.deck;
+let ownedTroops=progress.ownedTroops;
+let totalRounds=progress.totalRounds;
+let totalWins=progress.totalWins;
+let lastReward=progress.lastReward;
+function saveProgress(){
+  try{
+    localStorage.setItem(SAVE_KEY,JSON.stringify({gold,deck:deckIds,ownedTroops,totalRounds,totalWins,lastReward}));
+    const note=document.getElementById('saveNote');
+    if(note)note.textContent=`✓ Progress auto-saved · ${new Date().toLocaleTimeString()}`;
+  }catch(e){
+    console.warn('Could not save progress.',e);
+    const note=document.getElementById('saveNote');
+    if(note)note.textContent='Auto-save unavailable in this browser session.';
+  }
+}
+
+const menuScreen=document.getElementById('menuScreen');
+const battleScreen=document.getElementById('battleScreen');
+const menuGold=document.getElementById('menuGold');
+const menuStatus=document.getElementById('menuStatus');
+const deckEditor=document.getElementById('deckEditor');
+const shopGrid=document.getElementById('shopGrid');
+const careerLine=document.getElementById('careerLine');
+const resultPanel=document.getElementById('roundResult');
+const resultTitle=document.getElementById('resultTitle');
+const resultDescription=document.getElementById('resultDescription');
+const rewardBreakdown=document.getElementById('rewardBreakdown');
+const canvas=document.getElementById('game');
+const ctx=canvas.getContext('2d');
+const statusEl=document.getElementById('status');
+const cardsEl=document.getElementById('cards');
+const upgradesEl=document.getElementById('upgrades');
+let playerUnits=[],enemyUnits=[];
+let energy=5,maxEnergy=10,enemyEnergy=5,enemyMaxEnergy=10;
+const CORE_MAX_HP=2000;
+let kills=0,corePlayer=CORE_MAX_HP,coreEnemy=CORE_MAX_HP;
+let selectedCard=null,selectedUnit=null;
+let enemySpawnTimer=1.6,gameOver=false,lastTime=0,uiTimer=0,nextUnitId=1,floaters=[];
+let chest=null,chestSpawnTimer=32+Math.random()*28,chestsCollected=0,roundSettled=false;
+let inBattle=false;
+const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+const effectiveCost=type=>Math.max(1,type.cost-upgrades.discount);
+const setStatus=message=>{statusEl.textContent=message;};
+
+function renderMenu(){
+  menuGold.textContent=gold.toLocaleString();
+  careerLine.textContent=`${totalRounds} rounds played · ${totalWins} victories`;
+  deckEditor.innerHTML='';
+  deckIds.forEach((id,index)=>{
+    const troop=troopTypes.find(t=>t.id===id);
+    const slot=document.createElement('div');slot.className='deck-slot';
+    const number=document.createElement('div');number.className='slot-number';number.textContent=`Deck slot ${index+1}`;
+    const name=document.createElement('div');name.className='slot-troop';name.textContent=`${troop.icon} ${troop.name}`;
+    const desc=document.createElement('div');desc.className='slot-desc';desc.textContent=troop.desc;
+    const select=document.createElement('select');select.setAttribute('aria-label',`Choose troop for deck slot ${index+1}`);
+    troopTypes.filter(t=>ownedTroops.includes(t.id)).forEach(t=>{const option=document.createElement('option');option.value=t.id;option.textContent=`${t.icon} ${t.name}`;option.selected=t.id===id;select.appendChild(option);});
+    select.addEventListener('change',()=>changeDeckSlot(index,select.value));
+    slot.append(number,name,desc,select);deckEditor.appendChild(slot);
+  });
+  renderShop();
+}
+function renderShop(){
+  shopGrid.innerHTML='';
+  troopTypes.filter(t=>t.shopCost).forEach(t=>{
+    const owned=ownedTroops.includes(t.id);
+    const item=document.createElement('div');item.className='shop-item';
+    const name=document.createElement('div');name.className='shop-name';name.textContent=`${t.icon} ${t.name}`;
+    const stats=document.createElement('div');stats.className='shop-stats';stats.textContent=`${t.desc} Deploy cost: ${t.cost} energy. Health: ${t.hp} · Damage: ${t.damage}.`;
+    const price=document.createElement('div');price.className='shop-price';price.textContent=owned?'✓ Permanently unlocked':`🪙 ${t.shopCost} gold`;
+    const button=document.createElement('button');button.className='shop-btn';button.textContent=owned?'OWNED':`Buy ${t.name}`;button.disabled=owned||gold<t.shopCost;
+    button.addEventListener('click',()=>buyTroop(t.id));
+    item.append(name,stats,price,button);shopGrid.appendChild(item);
+  });
+}
+function changeDeckSlot(index,nextId){
+  if(!ownedTroops.includes(nextId))return;
+  const oldId=deckIds[index],otherIndex=deckIds.indexOf(nextId);
+  if(otherIndex!==-1&&otherIndex!==index)deckIds[otherIndex]=oldId;
+  deckIds[index]=nextId;
+  saveProgress();renderMenu();buildCards();
+  const chosen=troopTypes.find(t=>t.id===nextId);
+  menuStatus.textContent=`${chosen.icon} ${chosen.name} equipped in deck slot ${index+1}. Your deck is saved!`;
+}
+function buyTroop(id){
+  const troop=troopTypes.find(t=>t.id===id);
+  if(!troop||!troop.shopCost||ownedTroops.includes(id))return;
+  if(gold<troop.shopCost){menuStatus.textContent=`You need ${troop.shopCost-gold} more gold to unlock ${troop.name}.`;return;}
+  gold-=troop.shopCost;ownedTroops.push(id);saveProgress();renderMenu();buildCards();refreshUI();
+  menuStatus.textContent=`${troop.icon} ${troop.name} unlocked! Choose it from a deck slot to use it in battle.`;
+}
+function buildCards(){
+  cardsEl.innerHTML='';
+  deckIds.forEach(id=>{
+    const type=troopTypes.find(t=>t.id===id);
+    const b=document.createElement('button');b.className='card';b.id='card-'+type.id;
+    b.innerHTML=`<div class="top"><span><span class="icon">${type.icon}</span> ${type.name}</span><span class="cost" id="cost-${type.id}">${effectiveCost(type)} ⚡</span></div><div class="desc">${type.desc}</div>`;
+    b.addEventListener('click',()=>{if(gameOver||!inBattle)return;selectedCard=type.id;selectedUnit=null;setStatus(`${type.name} selected. Click the top or bottom lane to deploy it.`);refreshUI();});
+    cardsEl.appendChild(b);
+  });
+}
+function buildUpgrades(){
+  upgradesEl.innerHTML='';
+  upgradeDefs.forEach(def=>{
+    const button=document.createElement('button');
+    button.className='upgrade';button.id='upgrade-'+def.id;
+    button.innerHTML=`<div class="name"><span>${def.name}</span><span class="price" id="price-${def.id}"></span></div><div class="level" id="level-${def.id}"></div><div class="desc">${def.desc}</div>`;
+    button.addEventListener('click',()=>buyUpgrade(def.id));
+    upgradesEl.appendChild(button);
+  });
+}
+function upgradeCost(def){return def.base+upgrades[def.id]*2;}
+function buyUpgrade(id){
+  if(gameOver||!inBattle)return;
+  const def=upgradeDefs.find(d=>d.id===id);
+  if(!def||upgrades[id]>=def.max)return;
+  const cost=upgradeCost(def);
+  if(upgradeShards<cost){setStatus(`You need ${cost-upgradeShards} more Rift Shard${cost-upgradeShards===1?'':'s'} for ${def.name}.`);return;}
+  upgradeShards-=cost;upgrades[id]++;
+  if(id==='capacity'){maxEnergy+=2;energy=Math.min(maxEnergy,energy+2);setStatus(`Energy storage upgraded! Maximum energy is now ${maxEnergy}.`);}
+  else if(id==='regen')setStatus('Energy recharge upgraded! Energy regenerates faster.');
+  else if(id==='power'){playerUnits.forEach(u=>u.damage*=1.12);setStatus('Squad training upgraded! Your troops deal 12% more damage.');}
+  else if(id==='discount')setStatus('Efficient crafting upgraded! Troops cost less energy to deploy.');
+  refreshUI();
+}
+function refreshUI(){
+  menuGold.textContent=gold.toLocaleString();
+  document.getElementById('energyValue').textContent=`${energy.toFixed(1)} / ${maxEnergy}`;
+  document.getElementById('shardValue').textContent=String(upgradeShards);
+  document.getElementById('chestValue').textContent=String(chestsCollected);
+  document.getElementById('killValue').textContent=String(kills);
+  document.getElementById('coreValue').textContent=`${Math.max(0,Math.ceil(corePlayer))}/${CORE_MAX_HP} : ${Math.max(0,Math.ceil(coreEnemy))}/${CORE_MAX_HP}`;
+  deckIds.forEach(id=>{
+    const t=troopTypes.find(x=>x.id===id),b=document.getElementById('card-'+id);
+    if(!b)return;
+    b.classList.toggle('active',selectedCard===id);b.disabled=gameOver||energy<effectiveCost(t);
+    document.getElementById('cost-'+id).textContent=`${effectiveCost(t)} ⚡`;
+  });
+  upgradeDefs.forEach(def=>{
+    const button=document.getElementById('upgrade-'+def.id);
+    if(!button)return;
+    const level=upgrades[def.id],cost=upgradeCost(def);
+    document.getElementById('price-'+def.id).textContent=level>=def.max?'MAX':`💠 ${cost}`;
+    document.getElementById('level-'+def.id).textContent=`Level ${level}/${def.max}`;
+    button.disabled=gameOver||level>=def.max||upgradeShards<cost;
+  });
+}
+function makeUnit(type,team,lane){
+  return{id:nextUnitId++,team,typeId:type.id,name:type.name,icon:type.icon,lane,
+    x:team==='player'?145:815,y:lane===0?190:390,hp:type.hp,maxHp:type.hp,
+    damage:type.damage*(team==='player'?Math.pow(1.12,upgrades.power):1),
+    speed:type.speed,range:type.range,rate:type.rate,cooldown:0,
+    color:team==='player'?type.color:'#ff8989',role:type.role||'fighter',heal:type.heal||0,armor:type.armor||1,splashRadius:type.splashRadius||0,slowTimer:0,order:null,hold:false,hitFlash:0};
+}
+function deploy(typeId,y){
+  const type=troopTypes.find(t=>t.id===typeId);if(!type)return;
+  const cost=effectiveCost(type);
+  if(energy<cost){setStatus(`Not enough energy for ${type.name}.`);return;}
+  const lane=y<280?0:1;energy-=cost;playerUnits.push(makeUnit(type,'player',lane));
+  selectedCard=null;setStatus(`${type.name} deployed in the ${lane===0?'top':'bottom'} lane.`);refreshUI();
+}
+function issueOrder(unit,x,y){unit.order={x:clamp(x,95,865),y:clamp(y,105,455)};unit.hold=false;setStatus(`${unit.name} ordered to move to the marked location.`);}
+function cancelSelection(){selectedCard=null;selectedUnit=null;setStatus('Selection cancelled. Choose a troop card or click one of your troops.');refreshUI();}
+
+function startMatch(){
+  playerUnits=[];enemyUnits=[];floaters=[];chest=null;
+  chestSpawnTimer=32+Math.random()*28;
+  upgrades={regen:0,capacity:0,power:0,discount:0};
+  upgradeShards=0;
+  maxEnergy=10;energy=5;
+  enemyEnergy=5;enemyMaxEnergy=10;
+  kills=0;chestsCollected=0;roundSettled=false;corePlayer=CORE_MAX_HP;coreEnemy=CORE_MAX_HP;
+  selectedCard=null;selectedUnit=null;enemySpawnTimer=1.6;gameOver=false;
+  nextUnitId=1;uiTimer=0;lastTime=performance.now();
+  resultPanel.hidden=true;
+  inBattle=true;menuScreen.hidden=true;battleScreen.hidden=false;
+  setStatus('Battle started! Defeat enemies for Rift Shards and buy temporary upgrades in the workshop below. Menu gold is awarded after the round.');
+  refreshUI();
+}
+function restartMatch(){
+  if(inBattle&&!gameOver)finishRound('retreated');
+  startMatch();
+  setStatus('Fresh match started! Gold, unlocked troops, and your deck are auto-saved.');
+}
+function returnToMenu(){
+  if(inBattle&&!gameOver)finishRound('retreated');
+  inBattle=false;selectedCard=null;selectedUnit=null;
+  battleScreen.hidden=true;menuScreen.hidden=false;
+  renderMenu();
+  menuStatus.textContent=lastReward>0?`Last round earned ${lastReward} gold. Your progress is auto-saved.`:'Your progress is auto-saved in this browser.';
+}
+function finishRound(result){
+  if(roundSettled)return;
+  roundSettled=true;gameOver=true;selectedCard=null;selectedUnit=null;
+  const coreDamage=Math.max(0,CORE_MAX_HP-coreEnemy);
+  const baseReward=8;
+  const killReward=Math.min(60,kills*2);
+  const coreReward=Math.min(30,Math.floor(coreDamage/60));
+  const chestReward=chestsCollected*8;
+  const victoryReward=result==='victory'?35:0;
+  const survivalReward=Math.floor(Math.max(0,corePlayer)/250);
+  const total=baseReward+killReward+coreReward+chestReward+victoryReward+survivalReward;
+  gold+=total;lastReward=total;totalRounds++;
+  if(result==='victory')totalWins++;
+  saveProgress();refreshUI();
+  const title=result==='victory'?'🏆 VICTORY!':result==='defeat'?'💥 DEFEAT':'🏳️ ROUND ENDED';
+  resultTitle.textContent=title;
+  resultDescription.textContent=`You defeated ${kills} enemy troops, collected ${chestsCollected} chests and earned ${upgradeShards} Rift Shards during battle. You earned ${total} menu gold for this round.`;
+  rewardBreakdown.innerHTML=[
+    ['8','Round reward'],[killReward,'Troop defeats'],[coreReward,'Core damage'],[chestReward,'Treasure chests'],[victoryReward,'Victory bonus'],[survivalReward,'Core health bonus']
+  ].map(([amount,label])=>`<div class="reward-item"><b>+${amount} 🪙</b><span>${label}</span></div>`).join('');
+  resultPanel.hidden=false;
+  setStatus(`Round complete! ${total} gold has been added to your menu balance and auto-saved.`);
+}
+function distance(a,b){return Math.hypot(a.x-b.x,a.y-b.y);}
+function findTarget(unit,opponents){
+  let best=null,bestDist=Infinity;
+  for(const target of opponents){const d=distance(unit,target);if(d<=unit.range+18&&d<bestDist){best=target;bestDist=d;}}
+  return best;
+}
+function addFloater(x,y,text,color='#ffe28b'){floaters.push({x,y,text,color,life:1});}
+function eliminateDeaths(){
+  enemyUnits=enemyUnits.filter(u=>{
+    if(u.hp>0)return true;
+    if(!u.rewarded){u.rewarded=true;kills++;upgradeShards++;addFloater(u.x,u.y-20,'+1 SHARD','#b9adff');}
+    if(selectedUnit===u.id)selectedUnit=null;
+    return false;
+  });
+  playerUnits=playerUnits.filter(u=>{
+    if(u.hp>0)return true;
+    if(selectedUnit===u.id)selectedUnit=null;
+    addFloater(u.x,u.y-20,'DOWN','#ff9a9a');return false;
+  });
+}
+function updateUnit(u,dt){
+  u.cooldown-=dt;u.hitFlash=Math.max(0,u.hitFlash-dt);u.slowTimer=Math.max(0,u.slowTimer-dt);
+  const opponents=u.team==='player'?enemyUnits:playerUnits;
+  if(u.role==='healer'){
+    const allies=(u.team==='player'?playerUnits:enemyUnits).filter(a=>a.id!==u.id&&a.hp<a.maxHp-1&&distance(u,a)<=u.range);
+    allies.sort((a,b)=>(a.hp/a.maxHp)-(b.hp/b.maxHp));
+    const ally=allies[0];
+    if(ally){
+      if(u.cooldown<=0){const amount=Math.min(u.heal,ally.maxHp-ally.hp);ally.hp+=amount;u.cooldown=u.rate;addFloater(ally.x,ally.y-25,`+${Math.round(amount)} HP`,'#9dffb7');}
+      return;
+    }
+  }
+  const target=findTarget(u,opponents);
+  if(target){
+    if(u.cooldown<=0){
+      target.hp-=u.damage*(target.armor||1);target.hitFlash=.12;
+      if(u.role==='slower')target.slowTimer=Math.max(target.slowTimer,1.6);
+      if(u.splashRadius){
+        opponents.forEach(other=>{
+          if(other.id!==target.id&&distance(other,target)<=u.splashRadius){
+            other.hp-=u.damage*.55*(other.armor||1);other.hitFlash=.12;
+            addFloater(other.x,other.y-22,`-${Math.round(u.damage*.55)}`,'#ffd0a0');
+          }
+        });
+      }
+      u.cooldown=u.rate;addFloater(target.x,target.y-25,`-${Math.round(u.damage)}`,'#fff');
+    }
+    return;
+  }
+  if(u.team==='player'&&u.x>=785){if(u.cooldown<=0){coreEnemy-=u.damage;u.cooldown=u.rate;addFloater(880,245,`-${Math.round(u.damage)}`,'#ffb2a7');}return;}
+  if(u.team==='enemy'&&u.x<=175){if(u.cooldown<=0){corePlayer-=u.damage;u.cooldown=u.rate;addFloater(80,245,`-${Math.round(u.damage)}`,'#ffb2a7');}return;}
+  if(u.order){
+    const dx=u.order.x-u.x,dy=u.order.y-u.y,d=Math.hypot(dx,dy);
+    if(d<4){u.x=u.order.x;u.y=u.order.y;u.order=null;u.hold=true;}
+    else{const speed=u.speed*(u.slowTimer>0?.55:1);const move=Math.min(d,speed*dt);u.x+=dx/d*move;u.y+=dy/d*move;}
+  }else if(!u.hold)u.x+=(u.team==='player'?1:-1)*u.speed*(u.slowTimer>0?.55:1)*dt;
+}
+function spawnEnemy(){
+  const affordable=troopTypes.filter(t=>t.cost<=enemyEnergy);if(!affordable.length)return;
+  let type;
+  if(Math.random()<.48)type=affordable[Math.floor(Math.random()*affordable.length)];
+  else type=affordable.sort((a,b)=>b.cost-a.cost)[0];
+  const lane=Math.random()<.5?0:1;enemyEnergy-=type.cost;enemyUnits.push(makeUnit(type,'enemy',lane));
+}
+function spawnChest(){
+  const lane=Math.random()<.5?0:1;
+  chest={x:230+Math.random()*500,y:(lane===0?190:390)+(Math.random()*46-23),lane,life:22};
+  addFloater(chest.x,chest.y-32,'RARE CHEST!','#ffe27b');
+  setStatus('✨ A rare treasure chest appeared! Click it before it disappears for +3 Rift Shards and an end-of-round gold bonus.');
+}
+function collectChest(){
+  if(!chest)return false;
+  chestsCollected++;
+  upgradeShards+=3;
+  addFloater(chest.x,chest.y-26,'+3 RIFT SHARDS','#ffe27b');
+  chest=null;chestSpawnTimer=35+Math.random()*25;
+  setStatus('🎁 Treasure claimed! +3 Rift Shards now, plus 8 menu gold when the round ends.');
+  refreshUI();return true;
+}
+function drawChest(){
+  if(!chest)return;
+  const pulse=1+Math.sin(performance.now()/180)*.08;
+  ctx.save();ctx.translate(chest.x,chest.y);ctx.scale(pulse,pulse);
+  ctx.globalAlpha=.22;ctx.fillStyle='#ffd86a';ctx.beginPath();ctx.arc(0,0,34,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;
+  ctx.fillStyle='#6f3d1d';ctx.fillRect(-19,-5,38,23);
+  ctx.fillStyle='#b9752f';ctx.fillRect(-21,-12,42,13);
+  ctx.fillStyle='#e8b64e';ctx.fillRect(-21,-13,42,5);ctx.fillRect(-4,-11,8,29);
+  ctx.fillStyle='#ffe58b';ctx.fillRect(-4,-2,8,8);ctx.strokeStyle='#ffdf79';ctx.lineWidth=2;ctx.strokeRect(-21,-12,42,30);
+  ctx.fillStyle='#fff2b6';ctx.font='bold 11px system-ui';ctx.textAlign='center';ctx.fillText('CHEST',0,-23);ctx.restore();
+}
+function update(dt){
+  if(gameOver||!inBattle)return;
+  energy=Math.min(maxEnergy,energy+(.65+upgrades.regen*.12)*dt);
+  enemyEnergy=Math.min(enemyMaxEnergy,enemyEnergy+.58*dt);
+  enemySpawnTimer-=dt;if(enemySpawnTimer<=0){spawnEnemy();enemySpawnTimer=2.9+Math.random()*1.25;}
+  if(!chest){chestSpawnTimer-=dt;if(chestSpawnTimer<=0)spawnChest();}
+  else{chest.life-=dt;if(chest.life<=0){addFloater(chest.x,chest.y-20,'CHEST GONE','#d7c69b');chest=null;chestSpawnTimer=35+Math.random()*25;setStatus('The treasure chest disappeared. Keep battling; another may appear later.');}}
+  playerUnits.forEach(u=>updateUnit(u,dt));enemyUnits.forEach(u=>updateUnit(u,dt));eliminateDeaths();
+  floaters.forEach(f=>{f.y-=25*dt;f.life-=dt;});floaters=floaters.filter(f=>f.life>0);
+  if(coreEnemy<=0)finishRound('victory');
+  else if(corePlayer<=0)finishRound('defeat');
+  uiTimer+=dt;if(uiTimer>.18){refreshUI();uiTimer=0;}
+}
+function drawCore(x,y,hp,color,label){
+  ctx.save();ctx.translate(x,y);ctx.fillStyle='#10252b';ctx.beginPath();ctx.moveTo(-28,-42);ctx.lineTo(25,-42);ctx.lineTo(36,-19);ctx.lineTo(29,34);ctx.lineTo(0,48);ctx.lineTo(-30,30);ctx.lineTo(-36,-18);ctx.closePath();ctx.fill();
+  ctx.strokeStyle=color;ctx.lineWidth=4;ctx.stroke();ctx.fillStyle=color;ctx.beginPath();ctx.arc(0,0,17,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#10252b';ctx.beginPath();ctx.arc(0,0,7,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#10202a';ctx.fillRect(-36,-59,72,6);ctx.fillStyle=color;ctx.fillRect(-36,-59,72*clamp(hp/CORE_MAX_HP,0,1),6);
+  ctx.fillStyle='#f4f8fb';ctx.font='bold 11px system-ui';ctx.textAlign='center';ctx.fillText(label,0,-70);ctx.restore();
+}
+function drawArena(){
+  const g=ctx.createLinearGradient(0,0,960,560);g.addColorStop(0,'#183d42');g.addColorStop(.5,'#244b4d');g.addColorStop(1,'#183943');ctx.fillStyle=g;ctx.fillRect(0,0,960,560);
+  for(let i=0;i<55;i++){const x=(i*173)%960,y=(i*97)%560;ctx.fillStyle=i%2?'#ffffff08':'#031b2412';ctx.fillRect(x,y,22,3);}
+  ctx.fillStyle='#35645c';ctx.fillRect(0,112,960,150);ctx.fillRect(0,298,960,150);ctx.fillStyle='#427265';ctx.fillRect(0,264,960,34);
+  ctx.fillStyle='#193e50';ctx.fillRect(438,110,84,340);ctx.fillStyle='#53a7a5';ctx.globalAlpha=.36;for(let y=124;y<445;y+=28)ctx.fillRect(447,y,66,5);ctx.globalAlpha=1;
+  [190,390].forEach(y=>{ctx.fillStyle='#8a7655';ctx.fillRect(418,y-26,124,52);ctx.fillStyle='#b69b6d';ctx.fillRect(418,y-26,124,5);ctx.fillRect(418,y+21,124,5);});
+  ctx.font='bold 13px system-ui';ctx.fillStyle='#c7e4d5';ctx.fillText('NORTH LANE',20,101);ctx.fillText('SOUTH LANE',20,486);
+  ctx.fillStyle='#4cc7a114';ctx.fillRect(0,100,125,360);ctx.fillStyle='#ec858514';ctx.fillRect(835,100,125,360);
+  drawCore(73,280,corePlayer,'#61dfb6','YOUR CORE');drawCore(887,280,coreEnemy,'#ff8a8a','RIVAL CORE');
+}
+function drawUnit(u){
+  ctx.save();
+  if(u.order){ctx.strokeStyle='#a9ffe0aa';ctx.setLineDash([5,5]);ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(u.x,u.y);ctx.lineTo(u.order.x,u.order.y);ctx.stroke();ctx.setLineDash([]);ctx.beginPath();ctx.arc(u.order.x,u.order.y,11,0,Math.PI*2);ctx.stroke();}
+  if(u.id===selectedUnit){ctx.strokeStyle='#ffe27b';ctx.lineWidth=3;ctx.beginPath();ctx.arc(u.x,u.y,23,0,Math.PI*2);ctx.stroke();ctx.fillStyle='#ffe27b';ctx.font='bold 10px system-ui';ctx.textAlign='center';ctx.fillText('SELECTED',u.x,u.y-31);}
+  ctx.globalAlpha=u.hitFlash>0?.65:1;ctx.fillStyle='#10232b';ctx.beginPath();ctx.arc(u.x,u.y+3,18,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=u.color;ctx.beginPath();ctx.arc(u.x,u.y,16,0,Math.PI*2);ctx.fill();ctx.strokeStyle=u.team==='player'?'#d7fff0':'#ffe1df';ctx.lineWidth=2;ctx.stroke();
+  ctx.font='19px system-ui';ctx.textAlign='center';ctx.fillText(u.icon,u.x,u.y+7);ctx.fillStyle='#14232b';ctx.fillRect(u.x-20,u.y-26,40,5);
+  ctx.fillStyle=u.team==='player'?'#75efbd':'#ff8787';ctx.fillRect(u.x-20,u.y-26,40*clamp(u.hp/u.maxHp,0,1),5);ctx.restore();
+}
+function draw(){
+  drawArena();playerUnits.forEach(drawUnit);enemyUnits.forEach(drawUnit);drawChest();
+  floaters.forEach(f=>{ctx.save();ctx.globalAlpha=clamp(f.life,0,1);ctx.font='bold 14px system-ui';ctx.textAlign='center';ctx.fillStyle='#15212a';ctx.fillText(f.text,f.x+1,f.y+1);ctx.fillStyle=f.color;ctx.fillText(f.text,f.x,f.y);ctx.restore();});
+  if(gameOver){ctx.fillStyle='#07111acc';ctx.fillRect(0,0,960,560);ctx.textAlign='center';ctx.fillStyle='#fff';ctx.font='bold 42px system-ui';ctx.fillText(coreEnemy<=0?'VICTORY!':corePlayer<=0?'DEFEAT':'ROUND ENDED',480,260);ctx.font='18px system-ui';ctx.fillStyle='#d2dfeb';ctx.fillText('Your round reward is shown below the arena',480,295);}
+}
+function canvasPoint(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height};}
+canvas.addEventListener('pointerdown',e=>{
+  if(gameOver||!inBattle)return;
+  const p=canvasPoint(e);
+  if(chest&&Math.hypot(chest.x-p.x,chest.y-p.y)<34){collectChest();return;}
+  const clicked=[...playerUnits].reverse().find(u=>Math.hypot(u.x-p.x,u.y-p.y)<25);
+  if(clicked){selectedUnit=clicked.id;selectedCard=null;setStatus(`${clicked.name} selected. Click a destination in the arena to move it.`);refreshUI();return;}
+  if(selectedUnit!==null){const u=playerUnits.find(x=>x.id===selectedUnit);if(u){issueOrder(u,p.x,p.y);refreshUI();return;}selectedUnit=null;}
+  if(selectedCard&&p.y>=105&&p.y<=455){deploy(selectedCard,p.y);return;}
+  selectedUnit=null;selectedCard=null;setStatus('Choose a troop card to deploy, or click one of your troops to command it.');refreshUI();
+});
+function frame(now){
+  if(!lastTime)lastTime=now;
+  const dt=Math.min(.05,(now-lastTime)/1000);lastTime=now;
+  if(inBattle){update(dt);draw();}
+  requestAnimationFrame(frame);
+}
+document.getElementById('playBtn').addEventListener('click',startMatch);
+document.getElementById('menuBtn').addEventListener('click',returnToMenu);
+document.getElementById('cancelBtn').addEventListener('click',cancelSelection);
+document.getElementById('restartBtn').addEventListener('click',restartMatch);
+document.getElementById('backToMenuBtn').addEventListener('click',returnToMenu);
+window.addEventListener('keydown',e=>{if(e.key==='Escape'&&inBattle)cancelSelection();});
+window.addEventListener('beforeunload',saveProgress);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')saveProgress();});
+setInterval(saveProgress,10000);
+buildCards();buildUpgrades();renderMenu();refreshUI();saveProgress();requestAnimationFrame(frame);
+</script>
+</body>
+</html>
